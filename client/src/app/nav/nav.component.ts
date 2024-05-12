@@ -1,43 +1,37 @@
-import { Component, NgModule, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, NgModule, OnInit, model } from '@angular/core';
 import { AccountService } from '../_service/account.service';
-import { NgIf } from '@angular/common';
-import { CommonModule } from '@angular/common';
-import { BrowserModule } from '@angular/platform-browser';
-import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
+import { Observable, of } from 'rxjs';
+import { User } from '../_models/user';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
   selector: 'app-nav',
-  standalone: true,
-  imports: [FormsModule,CommonModule, NgIf],
   templateUrl: './nav.component.html',
   styleUrl: './nav.component.css'
 })
 export class NavComponent implements OnInit{
 
   model: any = {}
-  loggedIn = false;
-  constructor( private accountService: AccountService) {}
+  
+  constructor( public accountService: AccountService, private router: Router,
+    private toastr: ToastrService) {}
 
   ngOnInit(): void {
-
   }
+  
 login() {
   this.accountService.login(this.model).subscribe({
-    next: response => {
-      console.log(response);
-      this.loggedIn = true;
-    },
-    error: error => console.error(error)
-    
+    next: _ => this.router.navigateByUrl('/members'),
+    error: error => this.toastr.error(error.error)
   })
-  console.log(this.model);
 }
 
 logout()
 {
-  this.loggedIn = false;
+  this.accountService.logout();
+  this.router.navigateByUrl('/');
 }
 
 
